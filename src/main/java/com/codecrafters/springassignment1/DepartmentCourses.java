@@ -11,21 +11,12 @@ public class DepartmentCourses {
     public DepartmentCourses(List<Course> foundationCourses,
                              List<Course> undergraduateCourses,
                              List<Course> honoursCourses) {
-
         this.foundationCourses = foundationCourses;
         this.undergraduateCourses = undergraduateCourses;
         this.honoursCourses = honoursCourses;
     }
 
-    public List<Course> getFoundationCourses() {
-        return foundationCourses;
-    }
-
-    public List<Course> getUndergraduateCourses() {
-        return undergraduateCourses;
-    }
-
-    public List<Course> getHonoursCourses() {
-        return honoursCourses;
-    }
+    public List<Course> getFoundationCourses() { return foundationCourses; }
+    public List<Course> getUndergraduateCourses() { return undergraduateCourses; }
+    public List<Course> getHonoursCourses() { return honoursCourses; }
 }

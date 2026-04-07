@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CS Department Courses</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        h2 {
+            color: #444;
+            margin-top: 30px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .danger {
+            background-color: #dc3545;
+        }
+
+        .danger:hover {
+            background-color: #a71d2a;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🎓 CS Department Courses</h1>
+
+    <!-- ================= GROUPED COURSES ================= -->
+    <div class="card">
+        <h2>Foundation Courses</h2>
+        <table id="foundationTable"></table>
+    </div>
+
+    <div class="card">
+        <h2>Undergraduate Courses</h2>
+        <table id="undergradTable"></table>
+    </div>
+
+    <div class="card">
+        <h2>Honours Courses</h2>
+        <table id="honoursTable"></table>
+    </div>
+
+    <!-- ================= ADD COURSE ================= -->
+    <div class="card">
+        <h2>Add New Course</h2>
+
+        <input type="text" id="code" placeholder="Course Code">
+        <input type="text" id="name" placeholder="Course Name">
+        <input type="text" id="level" placeholder="Level (Foundation/Undergraduate/Honours)">
+
+        <button onclick="addCourse()">Add Course</button>
+    </div>
+
+    <!-- ================= ALL COURSES ================= -->
+    <div class="card">
+        <h2>All Courses</h2>
+        <button onclick="loadAllCourses()">Refresh</button>
+        <table id="allCoursesTable"></table>
+    </div>
+
+</div>
+
+<script>
+
+    function createTable(tableId, courses) {
+        let table = document.getElementById(tableId);
+        table.innerHTML = `
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Level</th>
+                <th>Action</th>
+            </tr>
+        `;
+
+        courses.forEach(c => {
+            let row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${c.code}</td>
+                <td>${c.name}</td>
+                <td>${c.level}</td>
+                <td>
+                    <button class="danger" onclick="deleteCourse('${c.code}')">Delete</button>
+                </td>
+            `;
+            table.appendChild(row);
+        });
+    }
+
+    // LOAD GROUPED
+    function loadGroupedCourses() {
+        fetch("/api/courses/department")
+            .then(res => res.json())
+            .then(data => {
+                createTable("foundationTable", data.foundationCourses);
+                createTable("undergradTable", data.undergraduateCourses);
+                createTable("honoursTable", data.honoursCourses);
+            });
+    }
+
+    // LOAD ALL
+    function loadAllCourses() {
+        fetch("/api/courses")
+            .then(res => res.json())
+            .then(data => {
+                createTable("allCoursesTable", data);
+            });
+    }
+
+    // ADD
+    function addCourse() {
+        let code = document.getElementById("code").value;
+        let name = document.getElementById("name").value;
+        let level = document.getElementById("level").value;
+
+        fetch("/api/courses", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ code, name, level })
+        })
+            .then(res => res.text())
+            .then(msg => {
+                alert(msg);
+                loadGroupedCourses();
+                loadAllCourses();
+            });
+    }
+
+    // DELETE
+    function deleteCourse(code) {
+        fetch("/api/courses/" + code, {
+            method: "DELETE"
+        })
+            .then(res => res.text())
+            .then(msg => {
+                alert(msg);
+                loadGroupedCourses();
+                loadAllCourses();
+            });
+    }
+
+    // AUTO LOAD
+    loadGroupedCourses();
+    loadAllCourses();
+
+</script>
+
+</body>
+</html>
